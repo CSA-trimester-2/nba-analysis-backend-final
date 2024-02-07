@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/nba")
 @CrossOrigin(origins = {"http://localhost:4200", "https://jishnus420.github.io", "http://127.0.0.1:4000", "https://pitsco.github.io"})
-public class PlayerStatsGeneralController {
+public class PlayerGeneralController {
     private List<JSONObject> playersData;
     private HttpStatus status;
     String lastRun = null;
