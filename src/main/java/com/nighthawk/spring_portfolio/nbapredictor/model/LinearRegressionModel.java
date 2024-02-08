@@ -9,14 +9,22 @@ public class LinearRegressionModel extends RegressionModel {
     public void train(List<Double> x_train, List<Double> y_train) {
         // Simple implementation of the least squares method for linear regression
         // Note: This is a simplistic implementation and assumes a single feature for simplicity
-        double xMean = x_train.stream().mapToDouble(val -> val).average().orElse(0.0);
-        double yMean = y_train.stream().mapToDouble(val -> val).average().orElse(0.0);
+        if (x_train.isEmpty() || y_train.isEmpty() || x_train.size() != y_train.size()) {
+            throw new IllegalArgumentException("Invalid training data.");
+        }
+
+        double xMean = x_train.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+        double yMean = y_train.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
 
         double numerator = 0.0;
         double denominator = 0.0;
         for (int i = 0; i < x_train.size(); i++) {
             numerator += (x_train.get(i) - xMean) * (y_train.get(i) - yMean);
-            denominator += (x_train.get(i) - xMean) * (x_train.get(i) - xMean);
+            denominator += Math.pow(x_train.get(i) - xMean, 2);
+        }
+
+        if (denominator == 0.0) {
+            throw new IllegalArgumentException("Denominator is zero.");
         }
 
         // Calculating coefficients
@@ -24,8 +32,7 @@ public class LinearRegressionModel extends RegressionModel {
         double alpha = yMean - (beta * xMean);
 
         // Storing coefficients and intercept
-        this.coefficients = new ArrayList<>();
-        this.coefficients.add(beta);
+        this.coefficients = List.of(beta);
         this.intercept = alpha;
     }
 

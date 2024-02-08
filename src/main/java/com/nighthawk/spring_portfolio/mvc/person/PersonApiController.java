@@ -1,8 +1,5 @@
 package com.nighthawk.spring_portfolio.mvc.person;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,11 +18,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
 @RequestMapping("/api/person")
-@CrossOrigin(origins = {"http://localhost:4200","https://jishnus420.github.io", "http://127.0.0.1:4000", "https://pitsco.github.io"})
+// @CrossOrigin(origins = {"https://vardaansinha.github.io"})
 public class PersonApiController {
     //     @Autowired
     // private JwtTokenUtil jwtGen;
@@ -94,16 +90,9 @@ public class PersonApiController {
     @PostMapping( "/post")
     public ResponseEntity<Object> postPerson(@RequestParam("email") String email,
                                              @RequestParam("password") String password,
-                                             @RequestParam("name") String name,
-                                             @RequestParam("dob") String dobString) {
-        Date dob;
-        try {
-            dob = new SimpleDateFormat("MM-dd-yyyy").parse(dobString);
-        } catch (Exception e) {
-            return new ResponseEntity<>(dobString +" error; try MM-dd-yyyy", HttpStatus.BAD_REQUEST);
-        }
-        // A person object WITHOUT ID will create a new record with default roles as student
-        Person person = new Person(email, password, name, dob);
+                                             @RequestParam("name") String name) {
+                                             
+        Person person = new Person(email, password, name);
         personDetailsService.save(person);
         return new ResponseEntity<>(email +" is created successfully", HttpStatus.CREATED);
     }
@@ -121,37 +110,5 @@ public class PersonApiController {
 
         // return resulting list and status, error checking should be added
         return new ResponseEntity<>(list, HttpStatus.OK);
-    }
-
-    /*
-    The personStats API adds stats by Date to Person table 
-    */
-    @PostMapping(value = "/setStats", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Person> personStats(@RequestBody final Map<String,Object> stat_map) {
-        // find ID
-        long id=Long.parseLong((String)stat_map.get("id"));  
-        Optional<Person> optional = repository.findById((id));
-        if (optional.isPresent()) {  // Good ID
-            Person person = optional.get();  // value from findByID
-
-            // Extract Attributes from JSON
-            Map<String, Object> attributeMap = new HashMap<>();
-            for (Map.Entry<String,Object> entry : stat_map.entrySet())  {
-                // Add all attribute other thaN "date" to the "attribute_map"
-                if (!entry.getKey().equals("date") && !entry.getKey().equals("id"))
-                    attributeMap.put(entry.getKey(), entry.getValue());
-            }
-
-            // Set Date and Attributes to SQL HashMap
-            Map<String, Map<String, Object>> date_map = new HashMap<>();
-            date_map.put( (String) stat_map.get("date"), attributeMap );
-            person.setStats(date_map);  // BUG, needs to be customized to replace if existing or append if new
-            repository.save(person);  // conclude by writing the stats updates
-
-            // return Person with update Stats
-            return new ResponseEntity<>(person, HttpStatus.OK);
-        }
-        // return Bad ID
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
     }
 }

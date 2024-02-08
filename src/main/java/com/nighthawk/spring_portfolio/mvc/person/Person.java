@@ -1,9 +1,5 @@
 package com.nighthawk.spring_portfolio.mvc.person;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -88,19 +84,10 @@ public class Person {
     
 
     // Constructor used when building object from an API
-    public Person(String email, String password, String name, Date dob) {
+    public Person(String email, String password, String name) {
         this.email = email;
         this.password = password;
         this.name = name;
-        this.dob = dob;
-    }
-
-    // A custom getter to return age from dob attribute
-    public int getAge() {
-        if (this.dob != null) {
-            LocalDate birthDay = this.dob.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            return Period.between(birthDay, LocalDate.now()).getYears(); }
-        return -1;
     }
 
     // Initialize static test data 
@@ -112,52 +99,26 @@ public class Person {
         p1.setEmail("toby@gmail.com");
         p1.setPassword("123Toby!");
         // adding Note to notes collection
-        try {  // All data that converts formats could fail
-            Date d = new SimpleDateFormat("MM-dd-yyyy").parse("01-01-1840");
-            p1.setDob(d);
-        } catch (Exception e) {
-            // no actions as dob default is good enough
-        }
 
         Person p2 = new Person();
-        p2.setName("Tester Testing");
-        p2.setEmail("test@gmail.com");
-        p2.setPassword("password");
-        try {
-            Date d = new SimpleDateFormat("MM-dd-yyyy").parse("01-01-1845");
-            p2.setDob(d);
-        } catch (Exception e) {
-        }
+        p2.setName("Alexander Graham Bell");
+        p2.setEmail("lexb@gmail.com");
+        p2.setPassword("123LexB!");
 
         Person p3 = new Person();
         p3.setName("Nikola Tesla");
         p3.setEmail("niko@gmail.com");
         p3.setPassword("123Niko!");
-        try {
-            Date d = new SimpleDateFormat("MM-dd-yyyy").parse("01-01-1850");
-            p3.setDob(d);
-        } catch (Exception e) {
-        }
 
         Person p4 = new Person();
         p4.setName("Madam Currie");
         p4.setEmail("madam@gmail.com");
         p4.setPassword("123Madam!");
-        try {
-            Date d = new SimpleDateFormat("MM-dd-yyyy").parse("01-01-1860");
-            p4.setDob(d);
-        } catch (Exception e) {
-        }
 
         Person p5 = new Person();
         p5.setName("John Mortensen");
         p5.setEmail("jm1021@gmail.com");
         p5.setPassword("123Qwerty!");
-        try {
-            Date d = new SimpleDateFormat("MM-dd-yyyy").parse("10-21-1959");
-            p5.setDob(d);
-        } catch (Exception e) {
-        }
 
         // Array definition and data initialization
         Person persons[] = {p1, p2, p3, p4, p5};
