@@ -1,10 +1,8 @@
 package com.nighthawk.spring_portfolio.nbapredictor.monte_carlo;
 
-import com.nighthawk.spring_portfolio.nbapredictor.monte_carlo.MonteCarloSimulator;
-import com.nighthawk.spring_portfolio.nbapredictor.monte_carlo.PlayerStats;
-import com.nighthawk.spring_portfolio.nbapredictor.monte_carlo.TeamStats;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -13,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+@RestController
+@RequestMapping("/api")
 public class MonteCarloController {
 
     static class Player {
@@ -66,7 +66,76 @@ public class MonteCarloController {
         }
     }
 
-    public static double calculateStandardDeviation(Map<String, List<Player>> teamsData) {
+    @PostMapping("/simulate")
+    public Map<String, Double[]> simulateFantasyPoints(@RequestBody String jsonData) {
+        // Parse JSON data into teamsData
+        Map<String, List<Player>> teamsData = parseJsonData(jsonData);
+
+        // Calculate the standard deviation of fantasy points
+        double standardDeviation = calculateStandardDeviation(teamsData);
+
+        // Assuming mean fantasy points is the sum of fantasy points divided by total players
+        double meanFantasyPoints = calculateMeanFantasyPoints(teamsData);
+
+        // Perform Monte Carlo simulation to project fantasy points
+        int numberOfSimulations = 10000; // Adjust this based on your needs
+        Double[] projectedFantasyPoints = new Double[numberOfSimulations];
+        for (int i = 0; i < numberOfSimulations; i++) {
+            projectedFantasyPoints[i] = simulateFantasyPoints(meanFantasyPoints, standardDeviation);
+        }
+
+        // Prepare response map
+        Map<String, Double[]> response = new HashMap<>();
+        response.put("projectedFantasyPoints", projectedFantasyPoints);
+
+        return response;
+    }
+
+    // Parses JSON string into Map<String, List<Player>>
+    private Map<String, List<Player>> parseJsonData(String jsonData) {
+        Map<String, List<Player>> teamsData = new HashMap<>();
+        List<Player> teamA = new ArrayList<>();
+        List<Player> teamB = new ArrayList<>();
+        String[] parts = jsonData.split("\"team[AB]\":\\[");
+
+        // Extract player data for team A
+        String[] playersData = parts[1].split("\\},\\{");
+        for (String playerData : playersData) {
+            Player player = new Player();
+            String[] playerParts = playerData.split("\"name\":\"");
+            player.setName(playerParts[1].split("\",")[0]);
+            String[] statsParts = playerData.split("\"points\":|,\"rebounds\":|,\"assists\":|\\}");
+            Stats stats = new Stats();
+            stats.setPoints(Integer.parseInt(statsParts[1]));
+            stats.setRebounds(Integer.parseInt(statsParts[2]));
+            stats.setAssists(Integer.parseInt(statsParts[3]));
+            player.setStats(stats);
+            teamA.add(player);
+        }
+
+        // Extract player data for team B
+        playersData = parts[2].split("\\},\\{");
+        for (String playerData : playersData) {
+            Player player = new Player();
+            String[] playerParts = playerData.split("\"name\":\"");
+            player.setName(playerParts[1].split("\",")[0]);
+            String[] statsParts = playerData.split("\"points\":|,\"rebounds\":|,\"assists\":|\\}");
+            Stats stats = new Stats();
+            stats.setPoints(Integer.parseInt(statsParts[1]));
+            stats.setRebounds(Integer.parseInt(statsParts[2]));
+            stats.setAssists(Integer.parseInt(statsParts[3]));
+            player.setStats(stats);
+            teamB.add(player);
+        }
+
+        // Add teams to the map
+        teamsData.put("teamA", teamA);
+        teamsData.put("teamB", teamB);
+
+        return teamsData;
+    }
+
+    public double calculateStandardDeviation(Map<String, List<Player>> teamsData) {
         double sum = 0;
         int totalPlayers = 0;
 
@@ -97,18 +166,18 @@ public class MonteCarloController {
         return Math.sqrt(variance);
     }
 
-    public static double calculateFantasyPoints(Player player) {
+    public double calculateFantasyPoints(Player player) {
         // Calculate fantasy points based on player stats (e.g., points, rebounds, assists)
         return player.getStats().getPoints() * 1.0 + player.getStats().getRebounds() * 1.2 + player.getStats().getAssists() * 1.5;
     }
 
-    public static double simulateFantasyPoints(double mean, double standardDeviation) {
+    public double simulateFantasyPoints(double mean, double standardDeviation) {
         Random random = new Random();
         // Generate a random number from a normal distribution with given mean and standard deviation
         return random.nextGaussian() * standardDeviation + mean;
     }
 
-    public static double calculateMeanFantasyPoints(Map<String, List<Player>> teamsData) {
+    public double calculateMeanFantasyPoints(Map<String, List<Player>> teamsData) {
         double sum = 0;
         int totalPlayers = 0;
 
@@ -123,74 +192,4 @@ public class MonteCarloController {
         // Calculate the mean of fantasy points
         return sum / totalPlayers;
     }
-
-    public static void main(String[] args) {
-        // Dummy data provided as a JSON string
-        String dummyData = "{\"teamA\":[{\"name\":\"Stephen Domingo\",\"stats\":{\"points\":6,\"rebounds\":5,\"assists\":4}},{\"name\":\"Nikola Jokic\",\"stats\":{\"points\":0,\"rebounds\":0,\"assists\":0}},{\"name\":\"LeBron James\",\"stats\":{\"points\":0,\"rebounds\":0,\"assists\":0}}],\"teamB\":[{\"name\":\"Joel Embiid\",\"stats\":{\"points\":0,\"rebounds\":0,\"assists\":0}},{\"name\":\"Luka Doncic\",\"stats\":{\"points\":0,\"rebounds\":0,\"assists\":0}},{\"name\":\"Anthony Edwards\",\"stats\":{\"points\":0,\"rebounds\":0,\"assists\":0}}]}";
-
-        // Convert JSON string to Java object
-        Map<String, List<Player>> teamsData = parseJsonData(dummyData);
-
-        // Calculate the standard deviation of fantasy points
-        double standardDeviation = calculateStandardDeviation(teamsData);
-
-        // Assuming mean fantasy points is the sum of fantasy points divided by total players
-        double meanFantasyPoints = calculateMeanFantasyPoints(teamsData);
-
-        // Perform Monte Carlo simulation to project fantasy points
-        int numberOfSimulations = 10000; // Adjust this based on your needs
-        double[] projectedFantasyPoints = new double[numberOfSimulations];
-        for (int i = 0; i < numberOfSimulations; i++) {
-            projectedFantasyPoints[i] = simulateFantasyPoints(meanFantasyPoints, standardDeviation);
-            System.out.println("Projected Fantasy Points for Simulation " + (i + 1) + ": " + projectedFantasyPoints[i]);
-        }
-
-        // You can analyze the projectedFantasyPoints array to get insights about the fantasy points distribution
-        // For example, you can calculate percentiles, average, maximum, minimum, etc.
-    }
-
-    // Parses JSON string into Map<String, List<Player>>
-    private static Map<String, List<Player>> parseJsonData(String jsonData) {
-    Map<String, List<Player>> teamsData = new HashMap<>();
-    List<Player> teamA = new ArrayList<>();
-    List<Player> teamB = new ArrayList<>();
-    String[] parts = jsonData.split("\"team[AB]\":\\[");
-
-    // Extract player data for team A
-    String[] playersData = parts[1].split("\\},\\{");
-    for (String playerData : playersData) {
-        Player player = new Player();
-        String[] playerParts = playerData.split("\"name\":\"");
-        player.setName(playerParts[1].split("\",")[0]);
-        String[] statsParts = playerData.split("\"points\":|,\"rebounds\":|,\"assists\":|\\}");
-        Stats stats = new Stats();
-        stats.setPoints(Integer.parseInt(statsParts[1]));
-        stats.setRebounds(Integer.parseInt(statsParts[2]));
-        stats.setAssists(Integer.parseInt(statsParts[3]));
-        player.setStats(stats);
-        teamA.add(player);
-    }
-
-    // Extract player data for team B
-    playersData = parts[2].split("\\},\\{");
-    for (String playerData : playersData) {
-        Player player = new Player();
-        String[] playerParts = playerData.split("\"name\":\"");
-        player.setName(playerParts[1].split("\",")[0]);
-        String[] statsParts = playerData.split("\"points\":|,\"rebounds\":|,\"assists\":|\\}");
-        Stats stats = new Stats();
-        stats.setPoints(Integer.parseInt(statsParts[1]));
-        stats.setRebounds(Integer.parseInt(statsParts[2]));
-        stats.setAssists(Integer.parseInt(statsParts[3]));
-        player.setStats(stats);
-        teamB.add(player);
-    }
-
-    // Add teams to the map
-    teamsData.put("teamA", teamA);
-    teamsData.put("teamB", teamB);
-
-    return teamsData;
-}
-
 }
