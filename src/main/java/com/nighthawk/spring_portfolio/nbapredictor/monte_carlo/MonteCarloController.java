@@ -14,17 +14,22 @@ public class MonteCarloController {
 
     @PostMapping("/predict")
     public String predict(@RequestBody TeamStats teams) {
-        // Assuming you have a variable to hold the number of simulations
-        int simulations = 1000; // You can adjust the number of simulations as needed
+        // variable for # of simulations
+        int simulations = 1000; 
 
         MonteCarloSimulator simulator = new MonteCarloSimulator();
         return simulator.simulate(teams, simulations);
     }
 
-    // This endpoint could be used to receive past game statistics from the frontend
+    // past game stats from frontend
     @PostMapping("/past-stats")
     public void receivePastStats(@RequestBody List<PlayerStats> pastStats) {
-        // Here you can process the received past game statistics as needed
-        // For example, you might store them in a database for future reference
+        System.out.println("Received past game statistics:");
+        for (PlayerStats playerStats : pastStats) {
+            System.out.println("Player: " + playerStats.getName());
+            System.out.println("Stats: " + playerStats.getStats());
+            System.out.println("Standard Deviations: " + playerStats.getStdDeviations());
+            System.out.println("---------------------------------------------");
+        }
     }
 }
