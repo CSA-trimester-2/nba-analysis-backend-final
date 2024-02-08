@@ -7,9 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
-import com.google.gson.Gson;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -130,8 +129,7 @@ public class MonteCarloController {
         String dummyData = "{\"teamA\":[{\"name\":\"Stephen Domingo\",\"stats\":{\"points\":6,\"rebounds\":5,\"assists\":4}},{\"name\":\"Nikola Jokic\",\"stats\":{\"points\":0,\"rebounds\":0,\"assists\":0}},{\"name\":\"LeBron James\",\"stats\":{\"points\":0,\"rebounds\":0,\"assists\":0}}],\"teamB\":[{\"name\":\"Joel Embiid\",\"stats\":{\"points\":0,\"rebounds\":0,\"assists\":0}},{\"name\":\"Luka Doncic\",\"stats\":{\"points\":0,\"rebounds\":0,\"assists\":0}},{\"name\":\"Anthony Edwards\",\"stats\":{\"points\":0,\"rebounds\":0,\"assists\":0}}]}";
 
         // Convert JSON string to Java object
-        Gson gson = new Gson();
-        Map<String, List<Player>> teamsData = gson.fromJson(dummyData, Map.class);
+        Map<String, List<Player>> teamsData = parseJsonData(dummyData);
 
         // Calculate the standard deviation of fantasy points
         double standardDeviation = calculateStandardDeviation(teamsData);
@@ -144,11 +142,55 @@ public class MonteCarloController {
         double[] projectedFantasyPoints = new double[numberOfSimulations];
         for (int i = 0; i < numberOfSimulations; i++) {
             projectedFantasyPoints[i] = simulateFantasyPoints(meanFantasyPoints, standardDeviation);
-            System.out.println("Projected Fantasy Points for Simulation " + (i+1) + ": " + projectedFantasyPoints[i]);
+            System.out.println("Projected Fantasy Points for Simulation " + (i + 1) + ": " + projectedFantasyPoints[i]);
         }
 
         // You can analyze the projectedFantasyPoints array to get insights about the fantasy points distribution
         // For example, you can calculate percentiles, average, maximum, minimum, etc.
     }
+
+    // Parses JSON string into Map<String, List<Player>>
+    private static Map<String, List<Player>> parseJsonData(String jsonData) {
+    Map<String, List<Player>> teamsData = new HashMap<>();
+    List<Player> teamA = new ArrayList<>();
+    List<Player> teamB = new ArrayList<>();
+    String[] parts = jsonData.split("\"team[AB]\":\\[");
+
+    // Extract player data for team A
+    String[] playersData = parts[1].split("\\},\\{");
+    for (String playerData : playersData) {
+        Player player = new Player();
+        String[] playerParts = playerData.split("\"name\":\"");
+        player.setName(playerParts[1].split("\",")[0]);
+        String[] statsParts = playerData.split("\"points\":|,\"rebounds\":|,\"assists\":|\\}");
+        Stats stats = new Stats();
+        stats.setPoints(Integer.parseInt(statsParts[1]));
+        stats.setRebounds(Integer.parseInt(statsParts[2]));
+        stats.setAssists(Integer.parseInt(statsParts[3]));
+        player.setStats(stats);
+        teamA.add(player);
+    }
+
+    // Extract player data for team B
+    playersData = parts[2].split("\\},\\{");
+    for (String playerData : playersData) {
+        Player player = new Player();
+        String[] playerParts = playerData.split("\"name\":\"");
+        player.setName(playerParts[1].split("\",")[0]);
+        String[] statsParts = playerData.split("\"points\":|,\"rebounds\":|,\"assists\":|\\}");
+        Stats stats = new Stats();
+        stats.setPoints(Integer.parseInt(statsParts[1]));
+        stats.setRebounds(Integer.parseInt(statsParts[2]));
+        stats.setAssists(Integer.parseInt(statsParts[3]));
+        player.setStats(stats);
+        teamB.add(player);
+    }
+
+    // Add teams to the map
+    teamsData.put("teamA", teamA);
+    teamsData.put("teamB", teamB);
+
+    return teamsData;
+}
 
 }
