@@ -1,45 +1,32 @@
 package com.nighthawk.spring_portfolio.nbapredictor.monte_carlo;
 
-import java.util.Map;
-
 public class PlayerStats {
+    private int points;
+    private int rebounds;
+    private int assists;
 
-    private String name;
-    private Map<String, Double> stats; // Average statistics
-    private Map<String, Double> stdDeviations; // Standard deviations for the stats
-
-    // Default constructor
-    public PlayerStats() {}
-
-    // Constructor with parameters
-    public PlayerStats(String name, Map<String, Double> stats, Map<String, Double> stdDeviations) {
-        this.name = name;
-        this.stats = stats;
-        this.stdDeviations = stdDeviations;
+    // Getters and setters
+    public int getPoints() {
+        return points;
     }
 
-    // Getters and Setters
-    public String getName() {
-        return name;
+    public void setPoints(int points) {
+        this.points = points;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public int getRebounds() {
+        return rebounds;
     }
 
-    public Map<String, Double> getStats() {
-        return stats;
+    public void setRebounds(int rebounds) {
+        this.rebounds = rebounds;
     }
 
-    public void setStats(Map<String, Double> stats) {
-        this.stats = stats;
+    public int getAssists() {
+        return assists;
     }
 
-    public Map<String, Double> getStdDeviations() {
-        return stdDeviations;
-    }
-
-    public void setStdDeviations(Map<String, Double> stdDeviations) {
-        this.stdDeviations = stdDeviations;
+    public void setAssists(int assists) {
+        this.assists = assists;
     }
 }
