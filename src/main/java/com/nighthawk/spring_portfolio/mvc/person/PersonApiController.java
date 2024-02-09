@@ -110,14 +110,16 @@ public class PersonApiController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @PutMapping("integerMap/update/{id}")
+    @PostMapping("/integerMap/update/{id}")
     public ResponseEntity<String> updateIntegerMap(@PathVariable long id, @RequestBody Map<String, Integer> integerMap) {
         Optional<Person> optional = repository.findById(id);
         if (optional.isPresent()) {
             Person person = optional.get();
-            person.setIntegerMap(integerMap);
+            Map<String, Integer> existingIntegerMap = person.getIntegerMap();
+            existingIntegerMap.putAll(integerMap);
+            person.setIntegerMap(existingIntegerMap);
             repository.save(person);
-            return new ResponseEntity<>("IntegerMap updated successfully for person with ID: " + id, HttpStatus.OK);
+            return new ResponseEntity<>("Additional key-value pairs added to the integerMap for person with ID: " + id, HttpStatus.OK);
         }
         return new ResponseEntity<>("Person not found with ID: " + id, HttpStatus.NOT_FOUND);
     }
