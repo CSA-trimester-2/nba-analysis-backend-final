@@ -86,6 +86,9 @@ public class Person {
     @Column(columnDefinition = "jsonb")
     private Map<String,Map<String, Object>> stats = new HashMap<>(); 
     
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private Map<String, Integer> integerMap = new HashMap<>();
 
     // Constructor used when building object from an API
     public Person(String email, String password, String name, Date dob) {
@@ -111,6 +114,8 @@ public class Person {
         p1.setName("Thomas Edison");
         p1.setEmail("toby@gmail.com");
         p1.setPassword("123Toby!");
+        p1.getIntegerMap().put("Team 1", 1);
+        p1.getIntegerMap().put("Team 2", 40);
         // adding Note to notes collection
         try {  // All data that converts formats could fail
             Date d = new SimpleDateFormat("MM-dd-yyyy").parse("01-01-1840");
@@ -123,6 +128,8 @@ public class Person {
         p2.setName("Tester Testing");
         p2.setEmail("test@gmail.com");
         p2.setPassword("password");
+        p2.getIntegerMap().put("Team 3", 2);
+        p2.getIntegerMap().put("Team 4", 100);
         try {
             Date d = new SimpleDateFormat("MM-dd-yyyy").parse("01-01-1845");
             p2.setDob(d);
@@ -133,6 +140,8 @@ public class Person {
         p3.setName("Nikola Tesla");
         p3.setEmail("niko@gmail.com");
         p3.setPassword("123Niko!");
+        p3.getIntegerMap().put("Team 6", 60);
+        p3.getIntegerMap().put("Team 5", 30);
         try {
             Date d = new SimpleDateFormat("MM-dd-yyyy").parse("01-01-1850");
             p3.setDob(d);
@@ -143,6 +152,8 @@ public class Person {
         p4.setName("Madam Currie");
         p4.setEmail("madam@gmail.com");
         p4.setPassword("123Madam!");
+        p4.getIntegerMap().put("Team 8", 120);
+        p4.getIntegerMap().put("Team 9", 203);
         try {
             Date d = new SimpleDateFormat("MM-dd-yyyy").parse("01-01-1860");
             p4.setDob(d);
@@ -153,6 +164,8 @@ public class Person {
         p5.setName("John Mortensen");
         p5.setEmail("jm1021@gmail.com");
         p5.setPassword("123Qwerty!");
+        p5.getIntegerMap().put("Team 91", 808);
+        p5.getIntegerMap().put("Easter Egg", 90210);
         try {
             Date d = new SimpleDateFormat("MM-dd-yyyy").parse("10-21-1959");
             p5.setDob(d);
@@ -164,14 +177,30 @@ public class Person {
         return(persons);
     }
 
-    public static void main(String[] args) {
-        // obtain Person from initializer
-        Person persons[] = init();
-
-        // iterate using "enhanced for loop"
-        for( Person person : persons) {
-            System.out.println(person);  // print object
-        }
+    public static void initializeIntegerMaps(Person[] persons) {
+            for (Person person : persons) {
+                Map<String, Integer> integerMap = person.getIntegerMap();
+                if (integerMap.isEmpty()) {
+                    // Initialize integerMap with different values for each person
+                    integerMap.put("value1", 10);
+                    integerMap.put("value2", 20);
+                    integerMap.put("value3", 30);
+                }
+            }
+    
     }
 
+    public static void main(String[] args) {
+        Person[] persons = init();
+        initializeIntegerMaps(persons);
+        for (Person person : persons) {
+            System.out.println("Name: " + person.getName());
+            System.out.println("Email: " + person.getEmail());
+            System.out.println("Password: " + person.getPassword());
+            System.out.println("Date of Birth: " + person.getDob());
+            System.out.println("Age: " + person.getAge());
+            System.out.println("Integer Map: " + person.getIntegerMap());
+            System.out.println("---------------------------------");
+        }
+    }
 }
