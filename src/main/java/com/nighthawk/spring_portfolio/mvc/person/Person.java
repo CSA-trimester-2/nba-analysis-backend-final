@@ -114,8 +114,8 @@ public class Person {
         p1.setName("Thomas Edison");
         p1.setEmail("toby@gmail.com");
         p1.setPassword("123Toby!");
-        p1.getIntegerMap().put("Team 1", 1);
-        p1.getIntegerMap().put("Team 2", 40);
+        p1.getIntegerMap().put("Player 1", 1);
+        p1.getIntegerMap().put("Player 2", 40);
         // adding Note to notes collection
         try {  // All data that converts formats could fail
             Date d = new SimpleDateFormat("MM-dd-yyyy").parse("01-01-1840");
@@ -128,8 +128,8 @@ public class Person {
         p2.setName("Tester Testing");
         p2.setEmail("test@gmail.com");
         p2.setPassword("password");
-        p2.getIntegerMap().put("Team 3", 2);
-        p2.getIntegerMap().put("Team 4", 100);
+        p2.getIntegerMap().put("Player 3", 2);
+        p2.getIntegerMap().put("Player 4", 100);
         try {
             Date d = new SimpleDateFormat("MM-dd-yyyy").parse("01-01-1845");
             p2.setDob(d);
@@ -140,8 +140,8 @@ public class Person {
         p3.setName("Nikola Tesla");
         p3.setEmail("niko@gmail.com");
         p3.setPassword("123Niko!");
-        p3.getIntegerMap().put("Team 6", 60);
-        p3.getIntegerMap().put("Team 5", 30);
+        p3.getIntegerMap().put("Player 6", 60);
+        p3.getIntegerMap().put("Player 5", 30);
         try {
             Date d = new SimpleDateFormat("MM-dd-yyyy").parse("01-01-1850");
             p3.setDob(d);
@@ -152,8 +152,8 @@ public class Person {
         p4.setName("Madam Currie");
         p4.setEmail("madam@gmail.com");
         p4.setPassword("123Madam!");
-        p4.getIntegerMap().put("Team 8", 120);
-        p4.getIntegerMap().put("Team 9", 203);
+        p4.getIntegerMap().put("Player 8", 120);
+        p4.getIntegerMap().put("Player 9", 203);
         try {
             Date d = new SimpleDateFormat("MM-dd-yyyy").parse("01-01-1860");
             p4.setDob(d);
@@ -164,7 +164,7 @@ public class Person {
         p5.setName("John Mortensen");
         p5.setEmail("jm1021@gmail.com");
         p5.setPassword("123Qwerty!");
-        p5.getIntegerMap().put("Team 91", 808);
+        p5.getIntegerMap().put("Player 91", 808);
         p5.getIntegerMap().put("Easter Egg", 90210);
         try {
             Date d = new SimpleDateFormat("MM-dd-yyyy").parse("10-21-1959");
