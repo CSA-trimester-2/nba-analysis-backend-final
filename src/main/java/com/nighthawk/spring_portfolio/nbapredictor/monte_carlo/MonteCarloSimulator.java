@@ -14,7 +14,7 @@ public class MonteCarloSimulator {
         double standardDeviation = calculateStandardDeviation(teamsData);
         double meanFantasyPoints = calculateMeanFantasyPoints(teamsData);
     
-        int numberOfSimulations = 20; // Change to 20 simulations
+        int numberOfSimulations = 30; // Change to 20 simulations
         List<Double> projectedFantasyPointsA = new ArrayList<>();
         List<Double> projectedFantasyPointsB = new ArrayList<>();
     
@@ -64,7 +64,7 @@ public class MonteCarloSimulator {
 
     private double calculateFantasyPoints(Player player) {
         PlayerStats stats = player.getStats();
-        return stats.getPoints() * 1.0 + stats.getRebounds() * 1.2 + stats.getAssists() * 1.5;
+        return stats.getPoints() * 2.0 + stats.getRebounds() * 1.2 + stats.getAssists() * 1.5;
     }
 
     private double[] simulateFantasyPoints(double mean, double standardDeviation) {

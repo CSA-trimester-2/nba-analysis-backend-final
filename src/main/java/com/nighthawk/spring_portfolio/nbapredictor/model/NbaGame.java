@@ -17,7 +17,6 @@ public class NbaGame {
     @JsonProperty("Status")
     private String status;
 
-    // Assuming 'Day' matches the format returned by the API. If it's a string, you might need to parse it.
     @JsonProperty("Day")
     private Timestamp day;
 
