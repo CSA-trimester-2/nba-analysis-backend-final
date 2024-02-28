@@ -32,7 +32,7 @@
             if (lastRun == null || !today.equals(lastRun)) {
                 try {
                     HttpRequest request = HttpRequest.newBuilder()
-                            .uri(URI.create("https://www.balldontlie.io/api/v1/players"))
+                            .uri(URI.create("https://api.balldontlie.io/v1/players"))
                             .method("GET", HttpRequest.BodyPublishers.noBody())
                             .build();
 

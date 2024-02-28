@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 @CrossOrigin(origins = {"http://localhost:4200","https://jishnus420.github.io", "http://127.0.0.1:4000", "https://pitsco.github.io", })
 public class PlayerSeasonAverage {
 
-    private final String apiUrl = "https://www.balldontlie.io/api/v1/season_averages";
+    private final String apiUrl = "https://api.balldontlie.io/v1/season_averages";
 
     @GetMapping("/{playerId}")
     public ResponseEntity<String> getPlayerStats(@PathVariable Long playerId) {
