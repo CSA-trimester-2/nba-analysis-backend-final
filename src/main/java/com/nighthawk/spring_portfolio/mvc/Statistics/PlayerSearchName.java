@@ -1,35 +1,54 @@
 package com.nighthawk.spring_portfolio.mvc.Statistics;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Date;
+import java.util.HashMap;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.http.HttpHeaders; // Import HttpHeaders
 
 @RestController
-@RequestMapping("/api/players")
-@CrossOrigin(origins = {"http://127.0.0.1:4000"})
+@RequestMapping("/api")
+@CrossOrigin(origins = {"http://localhost:4200", "https://jishnus420.github.io", "http://127.0.0.1:4000", "https://pitsco.github.io"})
 public class PlayerSearchName {
+    
+    private final String API_KEY = "f8073004-09ea-475c-840b-380354e78ae5";
 
-    private final String API_URL = "https://api.balldontlie.io/v1/players";
-    private final String API_KEY = "f8073004-09ea-475c-840b-380354e78ae5"; // Replace with your actual API key
+    @GetMapping("/players")
+    public ResponseEntity<String> searchNBAPlayerByName(@RequestParam String search) {
+        // Construct the API URL with the search query
+        String apiUrl = "https://api.balldontlie.io/v1/players?search=" + search;
 
-    @GetMapping
-    public String getPlayersByName(@RequestParam String search) {
-        // Construct the API URL with the search parameter
-        String apiUrlWithSearch = API_URL + "?search=" + search;
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(apiUrl))
+                    .header("Authorization", API_KEY)
+                    .GET()
+                    .build();
 
-        // Set up headers with the API key
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", API_KEY);
+            HttpResponse<String> response = HttpClient.newHttpClient().send(request,
+                    HttpResponse.BodyHandlers.ofString());
 
-        // Use RestTemplate to make a GET request to the API with headers
-        RestTemplate restTemplate = new RestTemplate();
-        String result = restTemplate.getForObject(apiUrlWithSearch, String.class);
+            // Return the player information as a string
+            return new ResponseEntity<>(response.body(), HttpStatus.OK);
+        } catch (Exception e) {
+            HashMap<String, String> errorStatus = new HashMap<>();
+            errorStatus.put("status", "NBA API failure: " + e.getMessage());
 
-        // Return the result
-        return result;
+            // Setup object for error
+            JSONObject errorBody = new JSONObject(errorStatus);
+            return new ResponseEntity<>(errorBody.toJSONString(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
