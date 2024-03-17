@@ -26,9 +26,9 @@ public class PlayerSearchName {
     private final String API_KEY = "f8073004-09ea-475c-840b-380354e78ae5";
 
     @GetMapping("/players")
-    public ResponseEntity<String> searchNBAPlayerByName(@RequestParam String search) {
-        // Construct the API URL with the search query
-        String apiUrl = "https://api.balldontlie.io/v1/players?search=" + search;
+    public ResponseEntity<String> searchNBAPlayerByName(@RequestParam String firstName, @RequestParam String lastName) {
+        // Construct the API URL with the first name and last name parameters
+        String apiUrl = "https://api.balldontlie.io/v1/players?first_name=" + firstName + "&last_name=" + lastName;
 
         try {
             HttpRequest request = HttpRequest.newBuilder()
