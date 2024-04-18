@@ -1,26 +1,55 @@
 package com.nighthawk.spring_portfolio.mvc.Statistics;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.HashMap;
+
+import org.json.simple.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.client.RestTemplate;
 
 @RestController
-@RequestMapping("/api/player")
-@CrossOrigin(origins = {"http://localhost:4200","https://jishnus420.github.io", "http://127.0.0.1:4000", "https://pitsco.github.io", })
+@RequestMapping("/api/nba")
+@CrossOrigin(origins = {"http://127.0.0.1:4000"})
 public class PlayerSeasonAverage {
+    private final String API_URL = "https://api.balldontlie.io/v1/season_averages";
+    private final String API_KEY = "f8073004-09ea-475c-840b-380354e78ae5";
+    private final int SEASON = 2023; // Hardcoded season value
 
-    private final String apiUrl = "https://api.balldontlie.io/v1/season_averages";
+    @GetMapping("/playerseason")
+    public ResponseEntity<String> searchNBAPlayerBySeasonAndIDs(@RequestParam("player_ids") Long playerID) {
+        try {
+            // Construct the API URL with the correct query parameters
+            String apiUrl = API_URL + "?season=" + SEASON + "&player_ids[]=" + playerID;
 
-    @GetMapping("/{playerId}")
-    public ResponseEntity<String> getPlayerStats(@PathVariable Long playerId) {
-        String url = apiUrl + "?player_ids[]=" + playerId;
+            // Build the HTTP request
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(apiUrl))
+                .header("Authorization", API_KEY)
+                .GET()
+                .build();
 
-        RestTemplate restTemplate = new RestTemplate();
-        String result = restTemplate.getForObject(url, String.class);
+            // Send the HTTP request and handle the response
+            HttpResponse<String> response = HttpClient.newHttpClient().send(request,
+                    HttpResponse.BodyHandlers.ofString());
 
-        return ResponseEntity.ok(result);
+            // Return the response body with OK status
+            return new ResponseEntity<>(response.body(), HttpStatus.OK);
+        } catch (Exception e) {
+            // Handle errors and return appropriate response
+            HashMap<String, String> errorStatus = new HashMap<>();
+            errorStatus.put("status", "NBA API failure: " + e.getMessage());
+
+            // Setup object for error
+            JSONObject errorBody = new JSONObject(errorStatus);
+            return new ResponseEntity<>(errorBody.toJSONString(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
