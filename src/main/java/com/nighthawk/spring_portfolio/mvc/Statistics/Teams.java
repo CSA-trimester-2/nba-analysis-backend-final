@@ -46,8 +46,4 @@ public class Teams {
             return "Error fetching team data: " + e.getMessage();
         }
     }
-
-    public static void main(String[] args) {
-        SpringApplication.run(DemoApplication.class, args);
-    }
 }
