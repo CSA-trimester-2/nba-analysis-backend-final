@@ -1,28 +1,15 @@
 package com.nighthawk.spring_portfolio.mvc.person;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/person")
@@ -71,10 +58,13 @@ public class PersonApiController {
     public ResponseEntity<Object> postPerson(@RequestParam("email") String email,
                                              @RequestParam("password") String password,
                                              @RequestParam("name") String name,
-                                             @RequestParam("dob") String dobString) {
+                                             @RequestParam("dob") String dobString,
+                                             @RequestParam("eco") Integer eco,
+                                             @RequestParam("primaryCrop") String primaryCrop,
+                                             @RequestParam("cash") Integer cash) {
         try {
             Date dob = new SimpleDateFormat("MM-dd-yyyy").parse(dobString);
-            Person person = new Person(email, password, name, dob);
+            Person person = new Person(email, password, name, eco, primaryCrop, cash, dob);
             personDetailsService.save(person);
             return new ResponseEntity<>(email + " is created successfully", HttpStatus.CREATED);
         } catch (Exception e) {
@@ -135,7 +125,7 @@ public class PersonApiController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("integerMap/delete/{id}")
+    @DeleteMapping("/integerMap/delete/{id}")
     public ResponseEntity<String> deleteIntegerMap(@PathVariable long id) {
         Optional<Person> optional = repository.findById(id);
         if (optional.isPresent()) {
@@ -145,5 +135,34 @@ public class PersonApiController {
             return new ResponseEntity<>("IntegerMap deleted successfully for person with ID: " + id, HttpStatus.OK);
         }
         return new ResponseEntity<>("Person not found with ID: " + id, HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/eco")
+    public ResponseEntity<List<Person>> getPeopleSortedByEco() {
+        List<Person> people = repository.findAll();
+        people.sort(Comparator.comparingInt(Person::getEco).reversed());
+        return new ResponseEntity<>(people, HttpStatus.OK);
+    }
+
+    @PostMapping("/ecoUpdate")
+    public ResponseEntity<Object> updateEco(@RequestBody Map<String, Object> requestBody) {
+        String email = (String) requestBody.get("email");
+        Integer eco = (Integer) requestBody.get("eco");
+        personDetailsService.changeEco(email, eco);
+        return new ResponseEntity<>(email + " eco score updated successfully", HttpStatus.CREATED);
+    }
+
+    // @GetMapping("/cash/{id}")
+    // public ResponseEntity<Integer> getCash(@PathVariable long id) {
+    //     int cash = personDetailsService.getCash(id);
+    //     return new ResponseEntity<>(cash, HttpStatus.OK);
+    // }
+
+    @PostMapping("/cashUpdate")
+    public ResponseEntity<Object> updateCash(@RequestBody Map<String, Object> requestBody) {
+        String email = (String) requestBody.get("email");
+        Integer cash = (Integer) requestBody.get("cash");
+        personDetailsService.changeCash(email, cash);
+        return new ResponseEntity<>(email + " cash amount updated successfully", HttpStatus.CREATED);
     }
 }
